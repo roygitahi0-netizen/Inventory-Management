@@ -138,5 +138,5 @@ if __name__ == "__main__":
 
     logging.getLogger("werkzeug").setLevel(logging.ERROR)
     logging.getLogger("flask.app").setLevel(logging.ERROR)
-    # Flask's run() forwards to werkzeug.run_simple; newer versions don't support `quiet`.
+    
     app.run(host="127.0.0.1", port=5000, debug=False, use_reloader=False)
