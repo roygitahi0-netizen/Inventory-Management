@@ -33,9 +33,6 @@ A polished Flask-based inventory application with a REST API, a CLI, and automat
 
    ```bash
    python app.py
-   ```
-
-   The API will be available at http://127.0.0.1:5000.
 
 ## API overview
 
