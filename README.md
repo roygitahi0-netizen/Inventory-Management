@@ -68,6 +68,18 @@ Run the test suite with:
 python -m pytest -q
 ```
 
+## Pull request workflow
+
+This project uses feature branches for isolated work. The recommended flow is:
+
+1. Create a branch from main.
+2. Make focused changes.
+3. Open a pull request into main.
+4. Merge after review and passing tests.
+5. Delete the merged branch.
+
+A full workflow guide is available in [PR_WORKFLOW.md](PR_WORKFLOW.md).
+
 ## Notes
 
 The app uses a local SQLite database file named inventory.db. It is created automatically on first run and is intended for local development and testing.
