@@ -32,10 +32,6 @@ A simple Flask-based inventory app with a REST API, a CLI, and automated tests. 
 4. Start the app:
 
    ```bash
-   python app.py
-   ```
-
-   The API will be available at http://127.0.0.1:5000.
 
 ## Usage
 
@@ -77,8 +73,6 @@ This project uses feature branches for isolated work. The recommended flow is:
 3. Open a pull request into main.
 4. Merge after review and passing tests.
 5. Delete the merged branch.
-
-A full workflow guide is available in [PR_WORKFLOW.md](PR_WORKFLOW.md).
 
 ## Notes
 
