@@ -1,25 +1,25 @@
 # Inventory Management System
 
-A simple Flask-based inventory app with a REST API, a CLI, and automated tests. It lets you create, view, update, delete, and search inventory items, and it can also look up product details from an external product API.
+A polished Flask-based inventory application with a REST API, a CLI, and automated tests. It supports creating, viewing, updating, deleting, and searching inventory items, and it can also look up product details from an external product API.
 
-## Features
+## Highlights
 
-- CRUD endpoints for inventory items
+- RESTful inventory endpoints
 - Search by name and barcode
 - Filtering by category and price
 - Barcode import workflow
-- CLI for common inventory actions
-- SQLite database persistence
+- CLI for everyday inventory actions
+- Local SQLite storage for development
 
 ## Project structure
 
-- app.py: Flask application and API routes
-- models.py: SQLite repository layer
-- external_api.py: external product lookup helpers
-- cli/cli.py: command-line interface
-- tests/: unit and integration tests
+- [app.py](app.py): Flask application and API routes
+- [models.py](models.py): SQLite repository layer
+- [external_api.py](external_api.py): external product lookup helpers
+- [cli/cli.py](cli/cli.py): command-line interface
+- [tests](tests): unit and integration tests
 
-## Setup
+## Quick start
 
 1. Clone the repository.
 2. Create and activate a virtual environment.
@@ -29,13 +29,15 @@ A simple Flask-based inventory app with a REST API, a CLI, and automated tests. 
    python -m pip install flask requests pytest
    ```
 
-4. Start the app:
+4. Start the server:
 
    ```bash
+   python app.py
+   ```
 
-## Usage
+   The API will be available at http://127.0.0.1:5000.
 
-### API
+## API overview
 
 - GET /api/health
 - GET /api/inventory
@@ -48,9 +50,9 @@ A simple Flask-based inventory app with a REST API, a CLI, and automated tests. 
 - GET /api/external/search?q=...
 - POST /api/inventory/import/barcode
 
-### CLI
+## CLI usage
 
-Run:
+Run the interactive CLI with:
 
 ```bash
 python cli/cli.py
@@ -58,7 +60,7 @@ python cli/cli.py
 
 ## Testing
 
-Run the test suite with:
+Run the full test suite with:
 
 ```bash
 python -m pytest -q

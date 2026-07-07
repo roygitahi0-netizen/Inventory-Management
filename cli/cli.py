@@ -1,6 +1,10 @@
 import sys
+import warnings
 
 import requests
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
 
 SERVER_URL = "http://127.0.0.1:5000"
 
@@ -33,7 +37,7 @@ def view_items():
 
 
 def add_item():
-    print("Enter the item details below:")
+    print("Add a new item")
     payload = {
         "name": input("Name: ").strip(),
         "barcode": input("Barcode (optional): ").strip() or None,
@@ -45,7 +49,7 @@ def add_item():
 
     response = requests.post(f"{SERVER_URL}/api/inventory", json=payload, timeout=10)
     if response.status_code == 201:
-        print("Item created successfully!")
+        print("Item created successfully.")
         print_items([response.json()])
     else:
         print(f"Error: {response.status_code}")
@@ -53,15 +57,15 @@ def add_item():
 
 
 def edit_item():
-    item_id = input("Enter the ID of the item to edit: ").strip()
+    item_id = input("Item ID: ").strip()
     fields = {}
-    for key, prompt in [("name", "New name: "), ("barcode", "New barcode: "), ("category", "New category: "), ("brand", "New brand: "), ("quantity", "New quantity: "), ("price", "New price: ")]:
+    for key, prompt in [("name", "Name: "), ("barcode", "Barcode: "), ("category", "Category: "), ("brand", "Brand: "), ("quantity", "Quantity: "), ("price", "Price: ")]:
         value = input(prompt).strip()
         if value:
             fields[key] = int(value) if key in {"quantity"} else float(value) if key == "price" else value
     response = requests.patch(f"{SERVER_URL}/api/inventory/{item_id}", json=fields, timeout=10)
     if response.status_code == 200:
-        print("Item updated!")
+        print("Item updated successfully.")
         print_items([response.json()])
     else:
         print(f"Error: {response.status_code}")
@@ -69,7 +73,7 @@ def edit_item():
 
 
 def delete_item():
-    item_id = input("Enter the ID of the item to delete: ").strip()
+    item_id = input("Item ID: ").strip()
     response = requests.delete(f"{SERVER_URL}/api/inventory/{item_id}", timeout=10)
     if response.status_code == 200:
         print(response.json().get("message", "Deleted."))
@@ -79,7 +83,7 @@ def delete_item():
 
 
 def search_external():
-    query = input("Search OpenFoodFacts for: ").strip()
+    query = input("Search: ").strip()
     response = requests.get(f"{SERVER_URL}/api/external/search", params={"q": query}, timeout=10)
     if response.status_code != 200:
         print(f"Error: {response.status_code}")
@@ -95,7 +99,7 @@ def search_external():
 
 def import_barcode(barcode=None):
     if barcode is None:
-        barcode = input("Enter barcode to look up: ").strip()
+        barcode = input("Barcode: ").strip()
     payload = {
         "barcode": barcode,
         "quantity": int(input("Starting quantity [0]: ").strip() or 0),
@@ -103,7 +107,7 @@ def import_barcode(barcode=None):
     }
     response = requests.post(f"{SERVER_URL}/api/inventory/import/barcode", json=payload, timeout=10)
     if response.status_code == 201:
-        print("Product imported and added to inventory!")
+        print("Product imported successfully.")
         print_items([response.json()])
     else:
         print(f"Error: {response.status_code}")
@@ -120,7 +124,7 @@ def show_menu():
 def run():
     while True:
         show_menu()
-        choice = input("Choose an option: ").strip()
+        choice = input("Option: ").strip()
         if choice == "0":
             print("Goodbye!")
             break
@@ -129,7 +133,7 @@ def run():
         if action:
             action()
         else:
-            print("That option is not valid, please try again.")
+            print("Invalid option. Please try again.")
 
 
 if __name__ == "__main__":

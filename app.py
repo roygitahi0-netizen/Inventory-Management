@@ -1,8 +1,12 @@
 import os
+import warnings
 from flask import Flask, jsonify, request
 
 from models import InventoryRepository, init_db
 from external_api import ExternalAPIError, fetch_product_by_barcode, search_products_by_name
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
 
 
 def create_app(db_path=None):
@@ -130,4 +134,9 @@ app = create_app()
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    import logging
+
+    logging.getLogger("werkzeug").setLevel(logging.ERROR)
+    logging.getLogger("flask.app").setLevel(logging.ERROR)
+    # Flask's run() forwards to werkzeug.run_simple; newer versions don't support `quiet`.
+    app.run(host="127.0.0.1", port=5000, debug=False, use_reloader=False)
