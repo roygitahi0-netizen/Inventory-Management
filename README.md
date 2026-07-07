@@ -1,3 +1,74 @@
-Inventory Management System
-A Flask-based inventory management system with REST API CRUD operations, OpenFoodFacts external API integration for fetching product details by barcode, a CLI interface for inventory management, and comprehensive unit tests. The system allows employees to add, edit, view, and delete inventory items through RESTful endpoints or command-line tools, with proper error handling, HTTP status codes, and JSON responses. To get started, clone the repository, create a virtual environment, install dependencies from requirements.txt using pip install -r requirements.txt, and run python app.py to start the Flask server at http://localhost:5000. The API supports filtering items by category and price range, while the CLI provides commands for all CRUD operations and external API searches. Tests can be executed with pytest test_inventory.py -v to validate all functionality and API interactions.
+# Inventory Management System
+
+A simple Flask-based inventory app with a REST API, a CLI, and automated tests. It lets you create, view, update, delete, and search inventory items, and it can also look up product details from an external product API.
+
+## Features
+
+- CRUD endpoints for inventory items
+- Search by name and barcode
+- Filtering by category and price
+- Barcode import workflow
+- CLI for common inventory actions
+- SQLite database persistence
+
+## Project structure
+
+- app.py: Flask application and API routes
+- models.py: SQLite repository layer
+- external_api.py: external product lookup helpers
+- cli/cli.py: command-line interface
+- tests/: unit and integration tests
+
+## Setup
+
+1. Clone the repository.
+2. Create and activate a virtual environment.
+3. Install dependencies:
+
+   ```bash
+   python -m pip install flask requests pytest
+   ```
+
+4. Start the app:
+
+   ```bash
+   python app.py
+   ```
+
+   The API will be available at http://127.0.0.1:5000.
+
+## Usage
+
+### API
+
+- GET /api/health
+- GET /api/inventory
+- POST /api/inventory
+- GET /api/inventory/<id>
+- PATCH /api/inventory/<id>
+- DELETE /api/inventory/<id>
+- GET /api/inventory/search?q=...
+- GET /api/external/barcode/<barcode>
+- GET /api/external/search?q=...
+- POST /api/inventory/import/barcode
+
+### CLI
+
+Run:
+
+```bash
+python cli/cli.py
+```
+
+## Testing
+
+Run the test suite with:
+
+```bash
+python -m pytest -q
+```
+
+## Notes
+
+The app uses a local SQLite database file named inventory.db. It is created automatically on first run and is intended for local development and testing.
 
