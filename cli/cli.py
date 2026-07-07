@@ -15,222 +15,119 @@ def print_items(items):
 
     for item in items:
         item_id = item["id"]
-        item_name = item["name"]
+        item_name = item["name"][:24] if len(item["name"]) > 24 else item["name"]
         item_qty = item["quantity"]
         item_price = item["price"]
-        item_category = item.get("category")
-        item_barcode = item.get("barcode")
-
-        if item_category is None:
-            item_category = ""
-        if item_barcode is None:
-            item_barcode = ""
-
-        if len(item_name) > 24:
-            item_name = item_name[:24]
-
+        item_category = item.get("category") or ""
+        item_barcode = item.get("barcode") or ""
         print(f"{item_id:<4} {item_name:<24} {item_qty:<5} {item_price:<9} {item_category:<14} {item_barcode}")
 
 
 def view_items():
-    response = requests.get(SERVER_URL + "/api/inventory", timeout=10)
-
+    response = requests.get(f"{SERVER_URL}/api/inventory", timeout=10)
     if response.status_code == 200:
-        items = response.json()
-        print_items(items)
+        print_items(response.json())
     else:
-        print("Error: " + str(response.status_code))
+        print(f"Error: {response.status_code}")
         print(response.text)
 
 
 def add_item():
     print("Enter the item details below:")
-
-    name = input("Name: ").strip()
-    barcode = input("Barcode (optional): ").strip()
-    category = input("Category (optional): ").strip()
-    brand = input("Brand (optional): ").strip()
-    quantity = input("Quantity [0]: ").strip()
-    price = input("Price [0.0]: ").strip()
-
-    if barcode == "":
-        barcode = None
-    if category == "":
-        category = None
-    if brand == "":
-        brand = None
-    if quantity == "":
-        quantity = 0
-    else:
-        quantity = int(quantity)
-    if price == "":
-        price = 0.0
-    else:
-        price = float(price)
-
     payload = {
-        "name": name,
-        "barcode": barcode,
-        "category": category,
-        "brand": brand,
-        "quantity": quantity,
-        "price": price
+        "name": input("Name: ").strip(),
+        "barcode": input("Barcode (optional): ").strip() or None,
+        "category": input("Category (optional): ").strip() or None,
+        "brand": input("Brand (optional): ").strip() or None,
+        "quantity": int(input("Quantity [0]: ").strip() or 0),
+        "price": float(input("Price [0.0]: ").strip() or 0.0),
     }
 
-    response = requests.post(SERVER_URL + "/api/inventory", json=payload, timeout=10)
-
+    response = requests.post(f"{SERVER_URL}/api/inventory", json=payload, timeout=10)
     if response.status_code == 201:
         print("Item created successfully!")
         print_items([response.json()])
     else:
-        print("Error: " + str(response.status_code))
+        print(f"Error: {response.status_code}")
         print(response.text)
 
 
 def edit_item():
     item_id = input("Enter the ID of the item to edit: ").strip()
-    print("Leave a field blank to keep it the same.")
-
     fields = {}
-
-    name = input("New name: ").strip()
-    if name != "":
-        fields["name"] = name
-
-    barcode = input("New barcode: ").strip()
-    if barcode != "":
-        fields["barcode"] = barcode
-
-    category = input("New category: ").strip()
-    if category != "":
-        fields["category"] = category
-
-    brand = input("New brand: ").strip()
-    if brand != "":
-        fields["brand"] = brand
-
-    quantity = input("New quantity: ").strip()
-    if quantity != "":
-        fields["quantity"] = int(quantity)
-
-    price = input("New price: ").strip()
-    if price != "":
-        fields["price"] = float(price)
-
-    response = requests.patch(SERVER_URL + "/api/inventory/" + item_id, json=fields, timeout=10)
-
+    for key, prompt in [("name", "New name: "), ("barcode", "New barcode: "), ("category", "New category: "), ("brand", "New brand: "), ("quantity", "New quantity: "), ("price", "New price: ")]:
+        value = input(prompt).strip()
+        if value:
+            fields[key] = int(value) if key in {"quantity"} else float(value) if key == "price" else value
+    response = requests.patch(f"{SERVER_URL}/api/inventory/{item_id}", json=fields, timeout=10)
     if response.status_code == 200:
         print("Item updated!")
         print_items([response.json()])
     else:
-        print("Error: " + str(response.status_code))
+        print(f"Error: {response.status_code}")
         print(response.text)
 
 
 def delete_item():
     item_id = input("Enter the ID of the item to delete: ").strip()
-
-    response = requests.delete(SERVER_URL + "/api/inventory/" + item_id, timeout=10)
-
+    response = requests.delete(f"{SERVER_URL}/api/inventory/{item_id}", timeout=10)
     if response.status_code == 200:
-        message = response.json().get("message", "Deleted.")
-        print(message)
+        print(response.json().get("message", "Deleted."))
     else:
-        print("Error: " + str(response.status_code))
+        print(f"Error: {response.status_code}")
         print(response.text)
 
 
 def search_external():
     query = input("Search OpenFoodFacts for: ").strip()
-
-    response = requests.get(SERVER_URL + "/api/external/search", params={"q": query}, timeout=10)
-
+    response = requests.get(f"{SERVER_URL}/api/external/search", params={"q": query}, timeout=10)
     if response.status_code != 200:
-        print("Error: " + str(response.status_code))
+        print(f"Error: {response.status_code}")
         print(response.text)
         return
-
     products = response.json()
-
     if not products:
         print("No products found.")
         return
-
-    count = 1
-    for product in products:
-        product_name = product["name"]
-        product_barcode = product.get("barcode")
-        product_brand = product.get("brand")
-        print(str(count) + ". " + product_name + "  (barcode: " + str(product_barcode) + ", brand: " + str(product_brand) + ")")
-        count = count + 1
+    for idx, product in enumerate(products, 1):
+        print(f"{idx}. {product['name']} (barcode: {product.get('barcode')}, brand: {product.get('brand')})")
 
 
 def import_barcode(barcode=None):
     if barcode is None:
         barcode = input("Enter barcode to look up: ").strip()
-
-    quantity = input("Starting quantity [0]: ").strip()
-    price = input("Price [0.0]: ").strip()
-
-    if quantity == "":
-        quantity = 0
-    else:
-        quantity = int(quantity)
-
-    if price == "":
-        price = 0.0
-    else:
-        price = float(price)
-
     payload = {
         "barcode": barcode,
-        "quantity": quantity,
-        "price": price
+        "quantity": int(input("Starting quantity [0]: ").strip() or 0),
+        "price": float(input("Price [0.0]: ").strip() or 0.0),
     }
-
-    response = requests.post(SERVER_URL + "/api/inventory/import/barcode", json=payload, timeout=10)
-
+    response = requests.post(f"{SERVER_URL}/api/inventory/import/barcode", json=payload, timeout=10)
     if response.status_code == 201:
         print("Product imported and added to inventory!")
         print_items([response.json()])
     else:
-        print("Error: " + str(response.status_code))
+        print(f"Error: {response.status_code}")
         print(response.text)
 
 
 def show_menu():
-    print("")
-    print("==== Inventory Management CLI ====")
-    print("1. View all items")
-    print("2. Add item manually")
-    print("3. Edit item")
-    print("4. Delete item")
-    print("5. Search OpenFoodFacts by name")
-    print("6. Import item from OpenFoodFacts by barcode")
-    print("0. Exit")
-    print("")
+    print("\n==== Inventory Management CLI ====")
+    for label, value in [("1. View all items", None), ("2. Add item manually", None), ("3. Edit item", None), ("4. Delete item", None), ("5. Search OpenFoodFacts by name", None), ("6. Import item from OpenFoodFacts by barcode", None), ("0. Exit", None)]:
+        print(label)
+    print()
 
 
 def run():
     while True:
         show_menu()
         choice = input("Choose an option: ").strip()
-
         if choice == "0":
             print("Goodbye!")
             break
-        elif choice == "1":
-            view_items()
-        elif choice == "2":
-            add_item()
-        elif choice == "3":
-            edit_item()
-        elif choice == "4":
-            delete_item()
-        elif choice == "5":
-            search_external()
-        elif choice == "6":
-            import_barcode()
+        actions = {"1": view_items, "2": add_item, "3": edit_item, "4": delete_item, "5": search_external, "6": import_barcode}
+        action = actions.get(choice)
+        if action:
+            action()
         else:
             print("That option is not valid, please try again.")
 
@@ -238,7 +135,6 @@ def run():
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         arg = sys.argv[1]
-
         if arg == "--list":
             view_items()
         elif arg == "--add":
